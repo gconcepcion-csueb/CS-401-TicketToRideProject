@@ -1,0 +1,30 @@
+package model;
+
+public enum City {
+    San_Francisco,
+    Portland,
+    Los_Angeles,
+    Las_Vegas,
+    Seattle,
+    Vancouver,
+    Calgary,
+    Phoenix,
+    Salt_Lake_City,
+    Helena,
+    Miami,
+    New_York_City,
+    Pittsburg,
+    Washington_DC,
+    Raleigh,
+    Atlanta,
+    Charleston,
+    Montreal,
+    Toronto,
+    Chicago,
+    Little_Rock,
+    New_Orleans,
+    Houston,
+    Kansas_City,
+    Omaha,
+    Saint_Louis
+}
