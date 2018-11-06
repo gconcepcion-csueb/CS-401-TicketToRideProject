@@ -44,6 +44,7 @@ public class Board {
         addRoute(new Route(City.Seattle, City.Portland, 1, RouteColor.GREY));
     }
     
+    
     public Board() {
         setupDefaultBoard();
     }

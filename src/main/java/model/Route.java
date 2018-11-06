@@ -18,6 +18,7 @@ public class Route {
         return startCity;
     }
 
+
     public City getStopCity() {
         return stopCity;
     }
@@ -30,6 +31,7 @@ public class Route {
             return startCity;
         return null;
     }
+    
 
     public int getNumberOfCars() {
         return numberOfCars;

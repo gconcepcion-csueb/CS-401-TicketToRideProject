@@ -13,7 +13,7 @@ public enum City {
     Helena,
     Miami,
     New_York_City,
-    Pittsburg,
+    Pittsburgh,
     Washington_DC,
     Raleigh,
     Atlanta,
