@@ -55,7 +55,7 @@ public class Route {
         if (type == TrainCarType.WILDCARD || color == RouteColor.GREY)
             return true;
 
-        return type.name() == color.Name();
+        return type.name() == color.name();
     }
 
 
