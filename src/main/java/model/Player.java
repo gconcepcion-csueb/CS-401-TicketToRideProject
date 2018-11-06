@@ -4,21 +4,28 @@ package model;
 import java.util.ArrayList;
 
 public class Player {
+    private String name;
     private int points = 0;
 
     private ArrayList<TrainCarCard> trainCarCards;
     private ArrayList<DestinationTicketCard> destinationTicketCards;
-    
-    // add/remove train car card
-    public void addTrainCarCard(TrainCarCard card) {
-        trainCarCards.add(card);
+
+
+    public String getName() {
+        return name;
     }
-    
-    public void removeTrainCarCard(TrainCarCard card) {
-        trainCarCards.remove(card);
+
+
+    public int getPoints() {
+        return points;
     }
-    
-    
+
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+
     public void addDestinationTicketCard(DestinationTicketCard card) {
         destinationTicketCards.add(card);
     }
@@ -35,14 +42,14 @@ public class Player {
         return numCards;
     }
 
-
-    public int getPoints() {
-        return points;
+    // add/remove train car card
+    public void addTrainCarCard(TrainCarCard card) {
+        trainCarCards.add(card);
     }
 
-
-    public void addPoints(int points) {
-        this.points += points;
+    
+    public void removeTrainCarCard(TrainCarCard card) {
+        trainCarCards.remove(card);
     }
 
 
@@ -56,5 +63,10 @@ public class Player {
                 numberOfCards--;
             }
         }
+    }
+
+
+    public Player(String name) {
+        this.name = name;
     }
 }
