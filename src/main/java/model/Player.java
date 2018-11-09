@@ -21,6 +21,22 @@ public class Player {
     }
 
 
+    /**
+     * @return the trainCarCards
+     */
+    public ArrayList<TrainCarCard> getTrainCarCards() {
+        return trainCarCards;
+    }
+
+
+    /**
+     * @return the destinationTicketCards
+     */
+    public ArrayList<DestinationTicketCard> getDestinationTicketCards() {
+        return destinationTicketCards;
+    }
+
+
     public void addPoints(int points) {
         this.points += points;
     }

@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Collections;
 
+import controller.GameController;
+
 
 public class Game {
     private final int NUMBER_OF_TRAIN_CARDS_PER_TYPE = 12;
     private final int NUMBER_OF_WILDCARDS = 14;
-    
+
+    private final int MAX_TRAIN_CAR_CARDS_TO_DRAW = 2;
+    private final int MAX_DESTINATION_CARDS_TO_DRAW = 3;
     
     private Board board;
     private ArrayList<Player> players;
@@ -22,7 +26,25 @@ public class Game {
     
     private ArrayDeque<DestinationTicketCard> destinationTicketCardDeck;
 
+    private GameController gameController;
 
+    private int currentPlayer = 0;  // current player whose turn it is
+    private boolean isPlaying = false;
+
+
+    /**
+     * 
+     * @return the board
+     */
+    public Board getBoard() {
+        return board;
+    }
+
+    /**
+     * Calculates points
+     * @param n number of train cars
+     * @return points
+     */
     private int calculatePoints(int n) {
         switch (n) {
             case 1:
@@ -40,15 +62,6 @@ public class Game {
             default:
                 return 0;
         }
-    }
-
-
-    public void playerKeepAndReturnDestinationCards(Player player, DestinationTicketCard [] cardsToKeep, DestinationTicketCard [] cardsToReturn) {
-        for (DestinationTicketCard cardToReturn : cardsToReturn)
-            destinationTicketCardDeck.addLast(cardToReturn);
-
-        for (DestinationTicketCard cardToKeep : cardsToKeep)
-            player.addDestinationTicketCard(cardToKeep);
     }
 
 
@@ -84,38 +97,63 @@ public class Game {
     }
 
 
-    public void playerClaimRoute(Player player, City city1, City city2, RouteColor routeColor, TrainCarType trainCarType) {
+    public void turnDrawTrainCarCardsFromFaceUpDeck(Player player) {
+        
+    }
+
+
+    public void turnDrawTrainCarCards(Player player) {
+        int cardsDrawn = 0;
+        boolean stopDrawingCards = false;
+
+        while (cardsDrawn < MAX_TRAIN_CAR_CARDS_TO_DRAW && !stopDrawingCards) {
+            boolean deckToDraw = gameController.getTrainCarCardDeckToDrawFrom(player);
+
+
+            cardsDrawn++;
+        }
+    }
+
+
+    public boolean playerClaimRoute(Player player, City city1, City city2, RouteColor routeColor, TrainCarType trainCarType) {
         // check if route is valid
         Route routeToClaim = board.getRoute(city1, city2, routeColor);
 
         if (routeToClaim == null)
-            return;
+            return false;
 
         // check if route is claimed
         if (routeToClaim.isClaimed())
-            return;
+            return false;
 
         // check if train car type can be used
         if (!routeToClaim.isValidTrainCarType(trainCarType))
-            return;
+            return false;
 
         int numberOfCarsToClaim = routeToClaim.getNumberOfCars();
         // check if player has enough train car cards
         if (player.getNumberOfTrainCarCardsOfType(trainCarType) < numberOfCarsToClaim)
-            return;
+            return false;
 
         // claim
         int pointsEarned = calculatePoints(numberOfCarsToClaim);
         routeToClaim.setPlayerClaimed(player);
         player.removeNumberOfTrainCarCardsOfType(numberOfCarsToClaim, trainCarType);    // remove cards from player
         player.addPoints(pointsEarned);
+
+        return true;
+    }
+
+
+    public void turnClaimRoute(Player player) {
+
     }
 
 
     public DestinationTicketCard [] drawDestinationCards() {
-        DestinationTicketCard [] cardsToReturn = new DestinationTicketCard[3];
+        DestinationTicketCard [] cardsToReturn = new DestinationTicketCard[MAX_DESTINATION_CARDS_TO_DRAW];
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < MAX_DESTINATION_CARDS_TO_DRAW; i++) {
             if (destinationTicketCardDeck.isEmpty())
                 break;
             DestinationTicketCard cardDrawn = destinationTicketCardDeck.pop();
@@ -124,6 +162,61 @@ public class Game {
 
         return cardsToReturn;
     }
+
+
+    public void playerKeepAndReturnDestinationCards(Player player, DestinationTicketCard [] cardsToKeep, DestinationTicketCard [] cardsToReturn) {
+        for (DestinationTicketCard cardToReturn : cardsToReturn)
+            destinationTicketCardDeck.addLast(cardToReturn);    // add to bottom of the deck
+
+        for (DestinationTicketCard cardToKeep : cardsToKeep)
+            player.addDestinationTicketCard(cardToKeep);
+    }
+
+
+    /**
+     * 
+     * @param player
+     */
+    public void turnDrawDestinationCards(Player player) {
+        DestinationTicketCard [] cards = drawDestinationCards();
+
+        // show player the cards they have drawn (through the view)
+        // get the cards the player wants to keep and return (through the controller)
+        DestinationTicketCard [] cardsToReturn = gameController.getDestinationCardsToKeepAndReturn(player, cards);
+        DestinationTicketCard [] cardsToKeep = new DestinationTicketCard[MAX_DESTINATION_CARDS_TO_DRAW - 1];
+
+        // keep and return cards
+        playerKeepAndReturnDestinationCards(player, cardsToKeep, cardsToReturn);
+    }
+
+
+    /**
+     * 
+     * @param player
+     */
+    public void takeTurnForPlayer(Player player) {
+        // get the type of turn from the player (through the controller?)
+        TurnType turnType = gameController.getTurnType(player);
+
+        switch (turnType) {
+            case DrawTrainCarCards:
+                turnDrawTrainCarCards(player);
+                break;
+            case ClaimRoute:
+                turnClaimRoute(player);
+                break;
+            case DrawDestinationTicketCards:
+                turnDrawDestinationCards(player);
+                break;
+        }
+    }
+
+
+    public void addPlayer(String name) {
+        Player newPlayer = new Player(name);
+        players.add(newPlayer);
+    }
+
 
     // setup Game class
     private void createAndAddTrainCarCards() {
@@ -173,21 +266,15 @@ public class Game {
 
         destinationTicketCardDeck.addAll(tempDeck);
     }
-
-
-    private void setupPlayers(int numberOfPlayers) {
-        for (int i = 0; i < numberOfPlayers; i++) {
-            Player player = new Player();
-            players.add(player);
-        }
-    }
     
     
-    public Game(int numberOfPlayers) {
+    public Game(GameController gameController) {
         this.board = new Board();
         this.players = new ArrayList<>();
         this.trainCarCards = new ArrayList<>();
         this.destinationTicketCards = new ArrayList<>();
+
+        this.gameController = gameController;
 
         faceDownTrainCarCardDeck = new ArrayDeque<>();
         faceUpTrainCarCardDeck = new ArrayList<>();
@@ -195,7 +282,8 @@ public class Game {
         destinationTicketCardDeck = new ArrayDeque<>();
         
         createAndAddTrainCarCards();
+        setupTrainCarCardDecks();
         createAndAddDestinationTicketCards();
-        setupPlayers(numberOfPlayers);
+        setupDestinationTicketCardDeck();
     }
 }

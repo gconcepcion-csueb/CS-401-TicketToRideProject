@@ -4,7 +4,15 @@ package model;
 import java.util.ArrayList;
 
 public class Board {
-    private ArrayList<Route> routes;    // ArrayList until I hardcode the size of the array
+    private ArrayList<Route> routes = new ArrayList<>();    // ArrayList until I hardcode the size of the array
+
+
+    /**
+     * @return the routes
+     */
+    public ArrayList<Route> getRoutes() {
+        return routes;
+    }
 
 
     public ArrayList<Route> getRoutesDirectlyConnectingCities(City city1, City city2) {
@@ -16,6 +24,18 @@ public class Board {
         }
 
         return routesConnecting;
+    }
+
+
+    public ArrayList<Route> getRoutesClaimedByPlayer(Player player) {
+        ArrayList<Route> routesClaimed = new ArrayList<>();
+
+        for (Route route : routes) {
+            if (route.getPlayerClaimed() == player)
+                routesClaimed.add(route);
+        }
+
+        return routesClaimed;
     }
 
 
@@ -43,7 +63,7 @@ public class Board {
         addRoute(new Route(City.Portland, City.Seattle, 1, RouteColor.GREY));
         addRoute(new Route(City.Seattle, City.Portland, 1, RouteColor.GREY));
     }
-    
+
     
     public Board() {
         setupDefaultBoard();
